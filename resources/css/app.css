@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+    .sidebar-link { 
+        @apply flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300 border border-transparent; 
+    }
+    .sidebar-link:hover { 
+        @apply bg-[#1C2333] text-white border-[#2A3441] translate-x-1; 
+    }
+    .sidebar-link.active { 
+        @apply bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 shadow-[0_0_15px_rgba(79,70,229,0.1)]; 
+    }
+    
+    .stat-card { @apply bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-300; }
+    .btn-primary { @apply inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-sm font-semibold rounded-xl shadow-lg shadow-indigo-200 hover:shadow-indigo-300 transition-all duration-300 hover:-translate-y-0.5; }
+    .btn-secondary { @apply inline-flex items-center gap-2 px-5 py-2.5 bg-white text-gray-700 text-sm font-semibold rounded-xl shadow-sm border border-gray-200 hover:bg-gray-50 transition-all duration-200; }
+    .btn-danger { @apply inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-red-500 to-rose-600 text-white text-sm font-semibold rounded-xl shadow-lg shadow-red-200 hover:shadow-xl transition-all duration-300; }
+    .form-input { @apply w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition-all duration-200 outline-none; }
+    .form-label { @apply block text-sm font-semibold text-gray-700 mb-2; }
+    .table-container { @apply bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden; }
+}
