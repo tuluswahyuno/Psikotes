@@ -1,77 +1,166 @@
 @extends('layouts.main')
 @section('title', 'Dashboard Peserta')
-@section('subtitle', 'Selamat datang, ' . auth()->user()->name)
 
 @section('content')
-<!-- Stats -->
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-    <div class="stat-card">
-        <div class="flex items-center justify-between mb-4">
-            <div class="w-12 h-12 bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl flex items-center justify-center">
-                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-            </div>
-        </div>
-        <p class="text-3xl font-bold text-gray-900">{{ $pendingCount }}</p>
-        <p class="text-sm text-gray-500 mt-1">Tes Menunggu</p>
+<!-- Header Section -->
+<div class="flex flex-wrap items-center justify-between gap-4 mb-8">
+    <div>
+        <h2 class="text-3xl font-black text-slate-900 dark:text-white tracking-tight">Selamat datang, {{ auth()->user()->name }}!</h2>
+        <p class="text-slate-500 dark:text-slate-400 mt-1">Siap melanjutkan persiapan CPNS hari ini? Progresmu terlihat bagus.</p>
     </div>
-    <div class="stat-card">
-        <div class="flex items-center justify-between mb-4">
-            <div class="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center">
-                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+    <a href="{{ route('peserta.skd.index') }}" class="bg-primary hover:bg-primary/90 text-white font-semibold py-3 px-6 rounded-xl flex items-center gap-2 shadow-lg shadow-primary/20 transition-all">
+        <span class="material-symbols-outlined">play_circle</span>
+        Mulai Simulasi
+    </a>
+</div>
+
+<!-- Stats Overview Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+    <!-- SKD Prep Card -->
+    <div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden group">
+        <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
+            <span class="material-symbols-outlined text-6xl text-primary">description</span>
+        </div>
+        <div class="relative z-10">
+            <div class="flex items-center gap-2 text-primary font-bold text-sm uppercase tracking-wider mb-2">
+                <span class="material-symbols-outlined text-sm">verified</span>
+                Simulasi SKD
+            </div>
+            <h3 class="text-slate-900 dark:text-white text-2xl font-bold mb-4">Seleksi Kompetensi Dasar</h3>
+            <div class="flex items-end gap-4">
+                <div>
+                    <p class="text-slate-500 dark:text-slate-400 text-xs font-semibold mb-1">Simulasi Selesai</p>
+                    <p class="text-4xl font-black text-slate-900 dark:text-white">{{ str_pad($skdCompletedCount, 2, '0', STR_PAD_LEFT) }}</p>
+                </div>
+                @if($skdCompletedCount > 0)
+                <div class="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 px-2 py-1 rounded text-sm font-bold flex items-center mb-1">
+                    <span class="material-symbols-outlined text-sm mr-1">trending_up</span> {{ $skdCompletedCount }} paket
+                </div>
+                @endif
+            </div>
+            <div class="mt-6 flex gap-3">
+                <a href="{{ route('peserta.skd.results') }}" class="bg-primary/10 hover:bg-primary/20 text-primary px-4 py-2 rounded-lg text-sm font-bold transition-colors">Lihat Riwayat</a>
+                <a href="{{ route('peserta.skd.leaderboard') }}" class="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-4 py-2 rounded-lg text-sm font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">Leaderboard</a>
             </div>
         </div>
-        <p class="text-3xl font-bold text-gray-900">{{ $completedCount }}</p>
-        <p class="text-sm text-gray-500 mt-1">Tes Selesai</p>
     </div>
-    <div class="stat-card">
-        <div class="flex items-center justify-between mb-4">
-            <div class="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center">
-                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"/></svg>
+
+    <!-- Psychotest Prep Card -->
+    <div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden group">
+        <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
+            <span class="material-symbols-outlined text-6xl text-primary">psychology</span>
+        </div>
+        <div class="relative z-10">
+            <div class="flex items-center gap-2 text-primary font-bold text-sm uppercase tracking-wider mb-2">
+                <span class="material-symbols-outlined text-sm">psychology</span>
+                Psikotes
+            </div>
+            <h3 class="text-slate-900 dark:text-white text-2xl font-bold mb-4">Tes Psikologi</h3>
+            <div class="flex items-end gap-4">
+                <div>
+                    <p class="text-slate-500 dark:text-slate-400 text-xs font-semibold mb-1">Tes Selesai</p>
+                    <p class="text-4xl font-black text-slate-900 dark:text-white">{{ str_pad($completedCount, 2, '0', STR_PAD_LEFT) }}</p>
+                </div>
+                @if($pendingCount > 0)
+                <div class="bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 px-2 py-1 rounded text-sm font-bold flex items-center mb-1">
+                    <span class="material-symbols-outlined text-sm mr-1">schedule</span> {{ $pendingCount }} pending
+                </div>
+                @endif
+            </div>
+            <div class="mt-6 flex gap-3">
+                <a href="{{ route('peserta.results.index') }}" class="bg-primary/10 hover:bg-primary/20 text-primary px-4 py-2 rounded-lg text-sm font-bold transition-colors">Lihat Riwayat</a>
             </div>
         </div>
-        <p class="text-3xl font-bold text-gray-900">{{ $pendingCount + $completedCount }}</p>
-        <p class="text-sm text-gray-500 mt-1">Total Tes</p>
     </div>
 </div>
 
-<!-- Pending Tests -->
-<h3 class="text-lg font-bold text-gray-900 mb-4">Tes yang Harus Dikerjakan</h3>
-<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-    @forelse($assignments as $assignment)
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
-        <div class="flex items-start justify-between mb-4">
-            <div>
-                <h4 class="text-lg font-bold text-gray-900">{{ $assignment->test->title }}</h4>
-                <p class="text-sm text-gray-500 mt-1">{{ $assignment->test->category }}</p>
+<!-- Recent Activity and Learning Progress -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <!-- Activity Feed -->
+    <div class="lg:col-span-2">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-xl font-bold text-slate-900 dark:text-white">Aktivitas Terbaru</h3>
+            <a href="{{ route('peserta.skd.results') }}" class="text-primary text-sm font-bold hover:underline">Lihat Semua</a>
+        </div>
+        <div class="space-y-4">
+            @forelse($latestSkdResults as $result)
+            <div class="flex items-center gap-4 p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
+                <div class="h-12 w-12 rounded-full {{ $result->is_passed ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600' : 'bg-red-100 dark:bg-red-900/30 text-red-600' }} flex items-center justify-center shrink-0">
+                    <span class="material-symbols-outlined">{{ $result->is_passed ? 'check_circle' : 'cancel' }}</span>
+                </div>
+                <div class="flex-1">
+                    <p class="text-slate-900 dark:text-white font-bold">{{ $result->package->title ?? 'Simulasi SKD' }}</p>
+                    <p class="text-slate-500 dark:text-slate-400 text-sm">Skor: {{ $result->total_score }}/550 • {{ $result->created_at->diffForHumans() }}</p>
+                </div>
+                <span class="text-xs font-bold px-2 py-1 rounded {{ $result->is_passed ? 'text-emerald-600 bg-emerald-100 dark:bg-emerald-900/30' : 'text-red-600 bg-red-100 dark:bg-red-900/30' }}">
+                    {{ $result->is_passed ? 'Lulus' : 'Gagal' }}
+                </span>
             </div>
-            <span class="text-xs font-medium bg-amber-50 text-amber-700 px-2.5 py-1 rounded-full">Pending</span>
+            @empty
+            <div class="flex items-center gap-4 p-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 text-center justify-center">
+                <div class="text-slate-400">
+                    <span class="material-symbols-outlined text-4xl block mb-2">history_edu</span>
+                    <p class="text-sm">Belum ada aktivitas simulasi. Mulai simulasi pertama Anda!</p>
+                </div>
+            </div>
+            @endforelse
+
+            @foreach($assignments as $assignment)
+            <div class="flex items-center gap-4 p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
+                <div class="h-12 w-12 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 shrink-0">
+                    <span class="material-symbols-outlined">psychology</span>
+                </div>
+                <div class="flex-1">
+                    <p class="text-slate-900 dark:text-white font-bold">{{ $assignment->test->title }}</p>
+                    <p class="text-slate-500 dark:text-slate-400 text-sm">Psikotes • {{ $assignment->test->duration_minutes }} menit</p>
+                </div>
+                <a href="{{ route('peserta.tests.show', $assignment->test) }}" class="text-amber-600 text-xs font-bold bg-amber-100 dark:bg-amber-900/30 px-2 py-1 rounded">Kerjakan</a>
+            </div>
+            @endforeach
         </div>
-        <p class="text-sm text-gray-600 mb-4 line-clamp-2">{{ $assignment->test->description }}</p>
-        <div class="flex items-center gap-4 text-xs text-gray-500 mb-4">
-            <span class="flex items-center gap-1">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                {{ $assignment->test->duration_minutes }} menit
-            </span>
-            <span class="flex items-center gap-1">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                {{ $assignment->test->questions()->count() }} soal
-            </span>
-            @if($assignment->deadline)
-            <span class="flex items-center gap-1 {{ $assignment->deadline->isPast() ? 'text-red-500' : '' }}">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                Deadline: {{ $assignment->deadline->format('d M Y') }}
-            </span>
-            @endif
+    </div>
+
+    <!-- Learning Progress -->
+    <div class="flex flex-col gap-6">
+        <h3 class="text-xl font-bold text-slate-900 dark:text-white">Progres Belajar</h3>
+        <div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+            <div class="mb-6">
+                <div class="flex justify-between text-sm mb-2">
+                    <span class="font-bold text-slate-700 dark:text-slate-300">TWK (Wawasan Kebangsaan)</span>
+                    <span class="font-black text-primary">{{ $twkPercent }}%</span>
+                </div>
+                <div class="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2">
+                    <div class="bg-primary h-2 rounded-full" style="width: {{ $twkPercent }}%"></div>
+                </div>
+            </div>
+            <div class="mb-6">
+                <div class="flex justify-between text-sm mb-2">
+                    <span class="font-bold text-slate-700 dark:text-slate-300">TIU (Intelegensia Umum)</span>
+                    <span class="font-black text-primary">{{ $tiuPercent }}%</span>
+                </div>
+                <div class="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2">
+                    <div class="bg-primary h-2 rounded-full" style="width: {{ $tiuPercent }}%"></div>
+                </div>
+            </div>
+            <div class="mb-2">
+                <div class="flex justify-between text-sm mb-2">
+                    <span class="font-bold text-slate-700 dark:text-slate-300">TKP (Karakteristik Pribadi)</span>
+                    <span class="font-black text-primary">{{ $tkpPercent }}%</span>
+                </div>
+                <div class="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2">
+                    <div class="bg-primary h-2 rounded-full" style="width: {{ $tkpPercent }}%"></div>
+                </div>
+            </div>
+            <a href="{{ route('peserta.skd.index') }}" class="block w-full mt-6 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 py-3 rounded-xl font-bold hover:opacity-90 transition-opacity text-center">
+                Mulai Simulasi
+            </a>
         </div>
-        <a href="{{ route('peserta.tests.show', $assignment->test) }}" class="btn-primary w-full justify-center">
-            Mulai Tes
-        </a>
+
+        <div class="bg-gradient-to-br from-primary to-blue-700 p-6 rounded-xl text-white shadow-xl shadow-primary/20">
+            <p class="text-white/80 text-sm font-bold uppercase tracking-wider mb-1">Target Mingguan</p>
+            <h4 class="text-xl font-black mb-4">Selesaikan 5 simulasi lagi untuk mencapai targetmu!</h4>
+            <a href="{{ route('peserta.skd.index') }}" class="inline-block bg-white text-primary px-4 py-2 rounded-lg text-xs font-bold shadow-md">Mulai Sekarang</a>
+        </div>
     </div>
-    @empty
-    <div class="col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 p-12 text-center">
-        <svg class="w-12 h-12 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-        <p class="text-sm text-gray-500">Tidak ada tes yang perlu dikerjakan saat ini.</p>
-    </div>
-    @endforelse
 </div>
 @endsection

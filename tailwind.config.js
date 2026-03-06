@@ -12,7 +12,15 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['Figtree', ...defaultTheme.fontFamily.sans],
+                sans: ['Public Sans', 'Figtree', ...defaultTheme.fontFamily.sans],
+                display: ['Public Sans', 'sans-serif'],
+            },
+            colors: {
+                "primary": "#135bec",
+                "background-light": "#f6f6f8",
+                "background-dark": "#101622",
+                "success": "#07883b",
+                "danger": "#d32f2f",
             },
         },
     },
