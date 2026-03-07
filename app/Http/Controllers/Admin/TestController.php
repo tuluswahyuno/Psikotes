@@ -8,9 +8,27 @@ use Illuminate\Http\Request;
 
 class TestController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $tests = Test::withCount('questions')->latest()->paginate(10);
+        $query = Test::withCount('questions')->latest();
+
+        if ($request->filled('search')) {
+            $query->where(function($q) use ($request) {
+                $q->where('title', 'like', '%' . $request->search . '%')
+                  ->orWhere('type', 'like', '%' . $request->search . '%');
+            });
+        }
+
+        if ($request->filled('category')) {
+            $query->where('category', $request->category);
+        }
+
+        if ($request->filled('status')) {
+            $query->where('is_active', $request->status);
+        }
+
+        $tests = $query->paginate(10)->withQueryString();
+        
         return view('admin.tests.index', compact('tests'));
     }
 

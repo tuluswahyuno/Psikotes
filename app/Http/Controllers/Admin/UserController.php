@@ -6,17 +6,37 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Test;
 use App\Models\TestAssignment;
+use App\Models\Result;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::where('role', 'peserta')
+        $query = User::where('role', 'peserta')
             ->withCount(['testAssignments', 'results'])
-            ->latest()
-            ->paginate(10);
-        return view('admin.users.index', compact('users'));
+            ->withAvg('results', 'score_percentage');
+
+        if ($request->filled('search')) {
+            $query->where(function($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->search . '%')
+                  ->orWhere('email', 'like', '%' . $request->search . '%');
+            });
+        }
+
+        $users = $query->latest()->paginate(10)->withQueryString();
+
+        // Calculate Stats
+        $stats = [
+            'total' => User::where('role', 'peserta')->count(),
+            'active_today' => Result::whereDate('created_at', today())->distinct('user_id')->count('user_id'),
+            'new_registrations' => User::where('role', 'peserta')->where('created_at', '>=', now()->subDays(7))->count(),
+            'high_performers' => User::where('role', 'peserta')->whereHas('results')->withAvg('results', 'score_percentage')->get()->filter(fn($u) => $u->results_avg_score_percentage >= 85)->count(),
+            'mid_performers' => User::where('role', 'peserta')->whereHas('results')->withAvg('results', 'score_percentage')->get()->filter(fn($u) => $u->results_avg_score_percentage >= 60 && $u->results_avg_score_percentage < 85)->count(),
+            'low_performers' => User::where('role', 'peserta')->whereHas('results')->withAvg('results', 'score_percentage')->get()->filter(fn($u) => $u->results_avg_score_percentage < 60)->count(),
+        ];
+
+        return view('admin.users.index', compact('users', 'stats'));
     }
 
     public function create()

@@ -10,14 +10,35 @@ use Illuminate\Http\Request;
 
 class SkdPackageController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $packages = SkdPackage::with('packageTests.test')
-            ->withCount('results')
-            ->latest()
-            ->paginate(10);
+        $query = SkdPackage::with('packageTests.test')->withCount('results');
 
-        return view('admin.skd.index', compact('packages'));
+        if ($request->filled('search')) {
+            $query->where('title', 'like', '%' . $request->search . '%')
+                  ->orWhere('description', 'like', '%' . $request->search . '%');
+        }
+
+        if ($request->filled('status')) {
+            if ($request->status === 'active') {
+                $query->where('is_active', true);
+            } elseif ($request->status === 'draft') {
+                $query->where('is_active', false);
+            }
+        }
+
+        $packages = $query->latest()->paginate(10)->withQueryString();
+
+        $stats = [
+            'total' => SkdPackage::count(),
+            'active' => SkdPackage::where('is_active', true)->count(),
+            'participants' => \App\Models\Result::query()
+                ->whereIn('test_id', \App\Models\SkdPackageTest::pluck('test_id'))
+                ->distinct('user_id')
+                ->count('user_id'),
+        ];
+
+        return view('admin.skd.index', compact('packages', 'stats'));
     }
 
     public function create()
