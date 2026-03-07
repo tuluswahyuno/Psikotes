@@ -15,14 +15,16 @@ class SkdSession extends Model
     protected $fillable = [
         'user_id',
         'skd_package_id',
+        'question_snapshot',
         'status',
         'started_at',
         'finished_at',
     ];
 
     protected $casts = [
-        'started_at' => 'datetime',
-        'finished_at' => 'datetime',
+        'started_at'        => 'datetime',
+        'finished_at'       => 'datetime',
+        'question_snapshot' => 'array',
     ];
 
     public function user(): BelongsTo
@@ -50,7 +52,7 @@ class SkdSession extends Model
         if (!$this->started_at) {
             return $this->package->duration_minutes * 60;
         }
-        $endTime = $this->started_at->addMinutes($this->package->duration_minutes);
+        $endTime         = $this->started_at->addMinutes($this->package->duration_minutes);
         $remainingSeconds = now()->diffInSeconds($endTime, false);
         return max(0, $remainingSeconds);
     }
@@ -58,5 +60,13 @@ class SkdSession extends Model
     public function isExpired(): bool
     {
         return $this->remaining_time <= 0;
+    }
+
+    /**
+     * Get question IDs for a given sub-test type from the snapshot.
+     */
+    public function getSnapshotIds(string $type): array
+    {
+        return $this->question_snapshot[$type] ?? [];
     }
 }

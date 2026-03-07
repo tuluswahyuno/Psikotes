@@ -106,6 +106,35 @@
                 </div>
             </div>
             
+            <!-- Bank Materi SKD -->
+            <div class="space-y-1" x-data="{ open: {{ request()->routeIs('admin.learning.*') ? 'true' : 'false' }} }">
+                <div @click="open = !open" class="flex items-center justify-between px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl cursor-pointer">
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined">auto_stories</span>
+                        <span class="font-semibold text-sm">Bank Materi</span>
+                    </div>
+                    <span class="material-symbols-outlined text-sm" :class="open ? 'rotate-180' : ''">expand_more</span>
+                </div>
+                <div x-show="open" class="pl-12 pr-4 space-y-1">
+                    <a class="block py-2 text-sm {{ request()->routeIs('admin.learning.*') ? 'text-primary font-bold' : 'text-slate-500 hover:text-primary transition-colors' }}" href="{{ route('admin.learning.sections') }}">Kelola Materi & Sub-Topik</a>
+                </div>
+            </div>
+
+            <!-- Soal Latihan -->
+            <div class="space-y-1" x-data="{ open: {{ request()->routeIs('admin.practice-questions.*') ? 'true' : 'false' }} }">
+                <div @click="open = !open" class="flex items-center justify-between px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl cursor-pointer">
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined">edit_note</span>
+                        <span class="font-semibold text-sm">Soal Latihan</span>
+                    </div>
+                    <span class="material-symbols-outlined text-sm" :class="open ? 'rotate-180' : ''">expand_more</span>
+                </div>
+                <div x-show="open" class="pl-12 pr-4 space-y-1">
+                    <a class="block py-2 text-sm {{ request()->routeIs('admin.practice-questions.index') ? 'text-primary font-bold' : 'text-slate-500 hover:text-primary transition-colors' }}" href="{{ route('admin.practice-questions.index') }}">Bank Soal</a>
+                    <a class="block py-2 text-sm {{ request()->routeIs('admin.practice-questions.import.*') ? 'text-primary font-bold' : 'text-slate-500 hover:text-primary transition-colors' }}" href="{{ route('admin.practice-questions.import.form') }}">Import CSV</a>
+                </div>
+            </div>
+
             <!-- SKD Package -->
             <div class="space-y-1" x-data="{ open: {{ request()->routeIs('admin.skd-packages.*') ? 'true' : 'false' }} }">
                 <div @click="open = !open" class="flex items-center justify-between px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl cursor-pointer">

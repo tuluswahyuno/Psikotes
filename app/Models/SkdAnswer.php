@@ -12,10 +12,14 @@ class SkdAnswer extends Model
 
     protected $fillable = [
         'skd_session_id',
-        'question_id',
-        'option_id',
-        'score',
+        'practice_question_id',
+        'answer',      // A, B, C, D, or E
         'is_doubtful',
+        'score',
+    ];
+
+    protected $casts = [
+        'is_doubtful' => 'boolean',
     ];
 
     public function session(): BelongsTo
@@ -23,13 +27,8 @@ class SkdAnswer extends Model
         return $this->belongsTo(SkdSession::class, 'skd_session_id');
     }
 
-    public function question(): BelongsTo
+    public function practiceQuestion(): BelongsTo
     {
-        return $this->belongsTo(Question::class);
-    }
-
-    public function option(): BelongsTo
-    {
-        return $this->belongsTo(Option::class);
+        return $this->belongsTo(PracticeQuestion::class, 'practice_question_id');
     }
 }

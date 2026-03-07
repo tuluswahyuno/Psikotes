@@ -10,12 +10,13 @@ class PracticeQuestion extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['sub_topic_id', 'question', 'options', 'correct_answer', 'explanation'];
+    protected $fillable = ['sub_topic_id', 'question', 'options', 'correct_answer', 'explanation', 'difficulty', 'tags'];
 
     protected function casts(): array
     {
         return [
             'options' => 'array',
+            'tags'    => 'array',
         ];
     }
 

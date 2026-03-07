@@ -13,10 +13,10 @@
 @section('content')
 <!-- Breadcrumb + Header -->
 <div class="mb-8">
-    <div class="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 mb-4">
-        <a href="{{ route('peserta.learn.index') }}" class="hover:text-primary transition-colors">Belajar SKD</a>
-        <span class="material-symbols-outlined text-xs">chevron_right</span>
-        <span class="font-semibold {{ $c['text'] }}">{{ $section->name }}</span>
+    <div class="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 mb-8 bg-white dark:bg-slate-900 p-3 px-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm w-fit">
+        <a href="{{ route('peserta.learn.index') }}" class="hover:text-primary transition-colors font-semibold">Belajar SKD</a>
+        <span class="material-symbols-outlined text-sm">chevron_right</span>
+        <span class="font-bold text-primary">{{ $section->name }}</span>
     </div>
 
     <div class="flex flex-wrap items-center justify-between gap-4">

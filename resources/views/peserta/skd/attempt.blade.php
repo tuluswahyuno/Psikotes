@@ -138,30 +138,31 @@
                                     
                                     <!-- Question Text -->
                                     <div class="question-text mb-8 md:mb-10 text-base md:text-lg leading-relaxed text-slate-800" style="font-size: 1.125rem;">
-                                        {!! nl2br(e($question->question_text)) !!}
+                                        {!! nl2br(e($question->question)) !!}
                                     </div>
 
-                                    <!-- Answer Options -->
+                                    <!-- Answer Options (PracticeQuestion: options = {A: text, B: text, ...}) -->
                                     <div class="space-y-3 md:space-y-4 max-w-4xl">
-                                        @php $letters = array('A', 'B', 'C', 'D', 'E'); @endphp
-                                        @foreach($question->options as $oIdx => $option)
+                                        @php
+                                            $opts = is_array($question->options) ? $question->options : json_decode($question->options ?? '{}', true);
+                                            $userAnswer = $existingAnswers[$question->id]['answer'] ?? null;
+                                        @endphp
+                                        @foreach($opts as $letter => $optText)
                                         <label class="option-row flex items-start gap-3 md:gap-4 p-3 md:p-4 rounded-xl cursor-pointer transition-all group border
-                                            {{ (isset($existingAnswers[$question->id]) && $existingAnswers[$question->id]['option_id'] == $option->id) 
-                                                ? 'border-primary bg-primary/5' 
-                                                : 'border-slate-200 hover:border-primary/50' }}"
-                                            onclick="saveAnswer({{ $question->id }}, {{ $option->id }}, this)">
+                                            {{ $userAnswer === $letter ? 'border-primary bg-primary/5' : 'border-slate-200 hover:border-primary/50' }}"
+                                            onclick="saveAnswer({{ $question->id }}, '{{ $letter }}', this)">
                                             
-                                            <input type="radio" name="q-{{ $question->id }}" value="{{ $option->id }}" 
+                                            <input type="radio" name="q-{{ $question->id }}" value="{{ $letter }}" 
                                                 class="mt-1 md:mt-1.5 w-4 h-4 md:w-5 md:h-5 text-primary focus:ring-primary border-slate-300"
-                                                {{ (isset($existingAnswers[$question->id]) && $existingAnswers[$question->id]['option_id'] == $option->id) ? 'checked' : '' }}
-                                                onchange="saveAnswer({{ $question->id }}, {{ $option->id }}, this.closest('.option-row'))">
+                                                {{ $userAnswer === $letter ? 'checked' : '' }}
+                                                onchange="saveAnswer({{ $question->id }}, '{{ $letter }}', this.closest('.option-row'))">
                                             
                                             <div class="flex gap-2 md:gap-4 flex-1">
-                                                <span class="font-bold text-sm md:text-base {{ (isset($existingAnswers[$question->id]) && $existingAnswers[$question->id]['option_id'] == $option->id) ? 'text-primary' : 'text-slate-400 group-hover:text-primary' }}">
-                                                    {{ $letters[$oIdx] }}.
+                                                <span class="font-bold text-sm md:text-base {{ $userAnswer === $letter ? 'text-primary' : 'text-slate-400 group-hover:text-primary' }}">
+                                                    {{ $letter }}.
                                                 </span>
-                                                <span class="text-sm md:text-base leading-snug {{ (isset($existingAnswers[$question->id]) && $existingAnswers[$question->id]['option_id'] == $option->id) ? 'text-slate-900 font-medium' : 'text-slate-700' }}">
-                                                    {{ $option->option_text }}
+                                                <span class="text-sm md:text-base leading-snug {{ $userAnswer === $letter ? 'text-slate-900 font-medium' : 'text-slate-700' }}">
+                                                    {{ $optText }}
                                                 </span>
                                             </div>
                                         </label>
@@ -213,8 +214,8 @@
                                 class="nav-btn aspect-square flex items-center justify-center text-[10px] md:text-xs font-bold rounded-lg transition-all shadow-sm focus:outline-none
                                 @php
                                     $status = 'unvisited';
-                                    if(isset($existingAnswers[$q->id]) && ($existingAnswers[$q->id]['option_id'] || $existingAnswers[$q->id]['is_doubtful'])) {
-                                        $status = $existingAnswers[$q->id]['is_doubtful'] ? 'doubtful' : 'answered';
+                                    if(isset($existingAnswers[$q->id])) {
+                                        $status = $existingAnswers[$q->id]['is_doubtful'] ? 'doubtful' : ($existingAnswers[$q->id]['answer'] ? 'answered' : 'unvisited');
                                     }
                                 @endphp
                                 {{ $status == 'answered' ? 'bg-success text-white border-b-2 border-success-700' : '' }}
@@ -363,9 +364,9 @@
         const qId = card.getAttribute('data-question-id');
         const isChecked = document.getElementById('doubtful-input').checked;
 
-        fetch(`/peserta/skd-sessions/${sessionId}/answer`, getFetchConfig({ question_id: qId, is_doubtful: isChecked }))
+        fetch(`/peserta/skd-sessions/${sessionId}/answer`, getFetchConfig({ practice_question_id: qId, is_doubtful: isChecked }))
         .then(() => {
-            if (!answers[qId]) answers[qId] = { option_id: null, is_doubtful: false };
+            if (!answers[qId]) answers[qId] = { answer: null, is_doubtful: false };
             answers[qId].is_doubtful = isChecked;
             updateNavVisual(qId, currentGlobalIdx, true);
             updateStats();
@@ -374,41 +375,34 @@
 
     let isSaving = false;
     
-    function saveAnswer(questionId, optionId, elementWrapper) {
+    function saveAnswer(questionId, answerLetter, elementWrapper) {
         if(isSaving) return;
         isSaving = true;
 
-        fetch(`/peserta/skd-sessions/${sessionId}/answer`, getFetchConfig({ question_id: questionId, option_id: optionId }))
+        fetch(`/peserta/skd-sessions/${sessionId}/answer`, getFetchConfig({ practice_question_id: questionId, answer: answerLetter }))
         .then(() => {
             const card = document.getElementById(`q-card-${questionId}`);
             
-            // Atur ulang semua baris (radio) di soal
+            // Reset all option rows
             card.querySelectorAll('.option-row').forEach(row => {
                 row.classList.remove('border-primary', 'bg-primary/5');
                 row.classList.add('border-slate-200');
-                
-                // Pastikan yang diuncheck hanya yang bukan opsi yang sedang diklik (ini penting untuk mencegah behavior aneh saat label diklik radio native reset)
                 const radio = row.querySelector('input[type="radio"]');
-                if(radio.value != optionId) radio.checked = false;
-                
-                // Kembalikan abjad opsi ke warna abu-abu
+                if(radio.value !== answerLetter) radio.checked = false;
                 const spans = row.querySelectorAll('span');
                 if(spans.length >= 2) {
                     spans[0].classList.remove('text-primary'); 
-                    spans[0].classList.add('text-slate-400'); // Answer Letter
-                    
+                    spans[0].classList.add('text-slate-400');
                     spans[1].classList.remove('text-slate-900', 'font-medium'); 
-                    spans[1].classList.add('text-slate-700'); // Answer Text
+                    spans[1].classList.add('text-slate-700');
                 }
             });
             
-            // Gunakan elementWrapper yang di-passing dari event
+            // Highlight the chosen option row
             if(elementWrapper) {
                 elementWrapper.classList.replace('border-slate-200', 'border-primary');
                 elementWrapper.classList.add('bg-primary/5');
                 elementWrapper.querySelector('input[type="radio"]').checked = true;
-                
-                // Update teks ke biru dan bold
                 const spans = elementWrapper.querySelectorAll('span');
                 if(spans.length >= 2) {
                     spans[0].classList.replace('text-slate-400', 'text-primary'); 
@@ -417,13 +411,12 @@
                 }
             }
 
-            if (!answers[questionId]) answers[questionId] = { option_id: null, is_doubtful: false };
-            answers[questionId].option_id = optionId;
+            if (!answers[questionId]) answers[questionId] = { answer: null, is_doubtful: false };
+            answers[questionId].answer = answerLetter;
             updateNavVisual(questionId, currentGlobalIdx, true);
             updateStats();
         })
         .finally(() => {
-            // Tunggu sebentar untuk mencegah event bubbling dari click label ke click radio
             setTimeout(() => { isSaving = false; }, 100);
         });
     }
@@ -432,7 +425,7 @@
         const btn = document.getElementById(`nav-btn-${qId}`);
         if(!btn) return;
         
-        let hasAnswer = answers[qId] && answers[qId].option_id;
+        let hasAnswer = answers[qId] && answers[qId].answer;
         let isDoubt = answers[qId] && answers[qId].is_doubtful;
         let hasBeenVisited = visitedNodes.includes(specificIdx) || hasAnswer || isDoubt;
 
@@ -458,7 +451,7 @@
 
     function updateStats() {
         let sc = 0, rg = 0;
-        Object.values(answers).forEach(a => { if (a.is_doubtful) rg++; else if (a.option_id) sc++; });
+        Object.values(answers).forEach(a => { if (a.is_doubtful) rg++; else if (a.answer) sc++; });
         document.getElementById('stat-answered').textContent = sc;
         document.getElementById('stat-doubtful').textContent = rg;
         document.getElementById('stat-unanswered').textContent = totalQuestions - sc - rg;
@@ -482,7 +475,7 @@
     allCardsInit.forEach(c => {
         const qId = c.getAttribute('data-question-id');
         const globalIdx = parseInt(c.getAttribute('data-global-idx'));
-        if ((answers[qId] && (answers[qId].option_id || answers[qId].is_doubtful)) && !visitedNodes.includes(globalIdx)) {
+        if ((answers[qId] && (answers[qId].answer || answers[qId].is_doubtful)) && !visitedNodes.includes(globalIdx)) {
             visitedNodes.push(globalIdx); 
         }
         if(globalIdx !== 1) updateNavVisual(qId, globalIdx, false); 

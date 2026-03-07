@@ -14,6 +14,8 @@ use App\Http\Controllers\Peserta\ResultController as PesertaResultController;
 use App\Http\Controllers\Peserta\SkdController;
 use App\Http\Controllers\Peserta\LearningController;
 use App\Http\Controllers\Peserta\PracticeController;
+use App\Http\Controllers\Admin\LearningController as AdminLearningController;
+use App\Http\Controllers\Admin\PracticeQuestionController as AdminPracticeQuestionController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -47,6 +49,38 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::resource('skd-packages', AdminSkdPackageController::class);
     Route::get('/skd-results', [AdminSkdResultController::class, 'index'])->name('skd-results.index');
     Route::get('/skd-results/{skdResult}', [AdminSkdResultController::class, 'show'])->name('skd-results.show');
+
+    // Learning Content Bank Routes
+    Route::prefix('learning')->name('learning.')->group(function () {
+        Route::get('/sections', [AdminLearningController::class, 'sections'])->name('sections');
+        // Sub-Topics
+        Route::get('/sections/{section}/sub-topics', [AdminLearningController::class, 'subTopics'])->name('sub-topics');
+        Route::get('/sections/{section}/sub-topics/create', [AdminLearningController::class, 'createSubTopic'])->name('sub-topics.create');
+        Route::post('/sections/{section}/sub-topics', [AdminLearningController::class, 'storeSubTopic'])->name('sub-topics.store');
+        Route::get('/sections/{section}/sub-topics/{subTopic}/edit', [AdminLearningController::class, 'editSubTopic'])->name('sub-topics.edit');
+        Route::put('/sections/{section}/sub-topics/{subTopic}', [AdminLearningController::class, 'updateSubTopic'])->name('sub-topics.update');
+        Route::delete('/sections/{section}/sub-topics/{subTopic}', [AdminLearningController::class, 'destroySubTopic'])->name('sub-topics.destroy');
+        // Materials
+        Route::get('/sections/{section}/sub-topics/{subTopic}/materials', [AdminLearningController::class, 'materials'])->name('materials');
+        Route::get('/sections/{section}/sub-topics/{subTopic}/materials/create', [AdminLearningController::class, 'createMaterial'])->name('materials.create');
+        Route::post('/sections/{section}/sub-topics/{subTopic}/materials', [AdminLearningController::class, 'storeMaterial'])->name('materials.store');
+        Route::get('/sections/{section}/sub-topics/{subTopic}/materials/{material}/edit', [AdminLearningController::class, 'editMaterial'])->name('materials.edit');
+        Route::put('/sections/{section}/sub-topics/{subTopic}/materials/{material}', [AdminLearningController::class, 'updateMaterial'])->name('materials.update');
+        Route::delete('/sections/{section}/sub-topics/{subTopic}/materials/{material}', [AdminLearningController::class, 'destroyMaterial'])->name('materials.destroy');
+    });
+
+    // Practice Questions Bank Routes
+    Route::prefix('practice-questions')->name('practice-questions.')->group(function () {
+        Route::get('/', [AdminPracticeQuestionController::class, 'index'])->name('index');
+        Route::get('/create', [AdminPracticeQuestionController::class, 'create'])->name('create');
+        Route::post('/', [AdminPracticeQuestionController::class, 'store'])->name('store');
+        Route::get('/{practiceQuestion}/edit', [AdminPracticeQuestionController::class, 'edit'])->name('edit');
+        Route::put('/{practiceQuestion}', [AdminPracticeQuestionController::class, 'update'])->name('update');
+        Route::delete('/{practiceQuestion}', [AdminPracticeQuestionController::class, 'destroy'])->name('destroy');
+        Route::get('/import-form', [AdminPracticeQuestionController::class, 'importForm'])->name('import.form');
+        Route::post('/import', [AdminPracticeQuestionController::class, 'import'])->name('import');
+        Route::get('/template/download', [AdminPracticeQuestionController::class, 'downloadTemplate'])->name('template.download');
+    });
 });
 
 // Peserta Routes

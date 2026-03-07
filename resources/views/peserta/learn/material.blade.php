@@ -13,12 +13,12 @@
 @section('content')
 <div class="max-w-6xl mx-auto">
     <!-- Breadcrumb -->
-    <div class="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 mb-6">
-        <a href="{{ route('peserta.learn.index') }}" class="hover:text-primary transition-colors">Belajar SKD</a>
-        <span class="material-symbols-outlined text-xs">chevron_right</span>
-        <a href="{{ route('peserta.learn.section', $section->slug) }}" class="hover:text-primary transition-colors">{{ $section->name }}</a>
-        <span class="material-symbols-outlined text-xs">chevron_right</span>
-        <span class="font-semibold text-slate-700 dark:text-slate-300">{{ $subTopic->title }}</span>
+    <div class="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 mb-8 bg-white dark:bg-slate-900 p-3 px-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm w-fit">
+        <a href="{{ route('peserta.learn.index') }}" class="hover:text-primary transition-colors font-semibold">Belajar SKD</a>
+        <span class="material-symbols-outlined text-sm">chevron_right</span>
+        <a href="{{ route('peserta.learn.section', $section->slug) }}" class="hover:text-primary transition-colors font-semibold">{{ $section->name }}</a>
+        <span class="material-symbols-outlined text-sm">chevron_right</span>
+        <span class="font-bold text-primary">{{ $subTopic->title }}</span>
     </div>
 
     <!-- Header -->

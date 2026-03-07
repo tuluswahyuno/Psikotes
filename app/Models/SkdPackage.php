@@ -14,17 +14,20 @@ class SkdPackage extends Model
         'title',
         'description',
         'duration_minutes',
+        'twk_question_count',
+        'tiu_question_count',
+        'tkp_question_count',
+        'twk_passing_grade',
+        'tiu_passing_grade',
+        'tkp_passing_grade',
+        'randomize_questions',
         'is_active',
     ];
 
     protected $casts = [
-        'is_active' => 'boolean',
+        'is_active'           => 'boolean',
+        'randomize_questions' => 'boolean',
     ];
-
-    public function packageTests(): HasMany
-    {
-        return $this->hasMany(SkdPackageTest::class);
-    }
 
     public function sessions(): HasMany
     {
@@ -36,17 +39,23 @@ class SkdPackage extends Model
         return $this->hasMany(SkdResult::class);
     }
 
-    public function getTestByType(string $type)
-    {
-        return $this->packageTests()->where('sub_test_type', $type)->first();
-    }
-
+    /**
+     * Total questions in this package.
+     */
     public function getTotalQuestionsAttribute(): int
     {
-        $total = 0;
-        foreach ($this->packageTests as $pt) {
-            $total += $pt->test->questions()->count();
-        }
-        return $total;
+        return $this->twk_question_count + $this->tiu_question_count + $this->tkp_question_count;
+    }
+
+    /**
+     * Get the passing grades as array.
+     */
+    public function getPassingGradesAttribute(): array
+    {
+        return [
+            'twk' => $this->twk_passing_grade,
+            'tiu' => $this->tiu_passing_grade,
+            'tkp' => $this->tkp_passing_grade,
+        ];
     }
 }

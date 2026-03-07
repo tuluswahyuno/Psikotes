@@ -98,17 +98,15 @@
                         </td>
                         <td class="px-6 py-5">
                             <div class="flex flex-wrap gap-1.5 min-w-[max-content]">
-                                @forelse($package->packageTests as $pt)
-                                    @if($pt->sub_test_type == 'twk')
-                                        <span class="px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-[10px] font-bold uppercase ring-1 ring-inset ring-blue-500/10">{{ $pt->sub_test_type }}</span>
-                                    @elseif($pt->sub_test_type == 'tiu')
-                                        <span class="px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 text-[10px] font-bold uppercase ring-1 ring-inset ring-purple-500/10">{{ $pt->sub_test_type }}</span>
-                                    @else
-                                        <span class="px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold uppercase ring-1 ring-inset ring-emerald-500/10">{{ $pt->sub_test_type }}</span>
-                                    @endif
-                                @empty
-                                    <span class="text-xs text-slate-400 italic">No Tests</span>
-                                @endforelse
+                                <span class="px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-[10px] font-bold uppercase ring-1 ring-inset ring-blue-500/10">
+                                    TWK: {{ $package->twk_question_count }}
+                                </span>
+                                <span class="px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 text-[10px] font-bold uppercase ring-1 ring-inset ring-purple-500/10">
+                                    TIU: {{ $package->tiu_question_count }}
+                                </span>
+                                <span class="px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold uppercase ring-1 ring-inset ring-emerald-500/10">
+                                    TKP: {{ $package->tkp_question_count }}
+                                </span>
                             </div>
                         </td>
                         <td class="px-6 py-5">
