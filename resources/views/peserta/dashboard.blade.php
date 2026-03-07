@@ -74,6 +74,27 @@
     </div>
 </div>
 
+<!-- Belajar SKD Card -->
+<div class="bg-gradient-to-r from-primary/5 to-purple-500/5 dark:from-primary/10 dark:to-purple-900/10 p-6 rounded-xl border border-primary/20 dark:border-primary/30 shadow-sm mb-8 relative overflow-hidden group">
+    <div class="absolute top-0 right-0 p-4 opacity-5 group-hover:scale-110 transition-transform">
+        <span class="material-symbols-outlined text-8xl text-primary">auto_stories</span>
+    </div>
+    <div class="relative z-10 flex flex-wrap items-center justify-between gap-4">
+        <div>
+            <div class="flex items-center gap-2 text-primary font-bold text-sm uppercase tracking-wider mb-2">
+                <span class="material-symbols-outlined text-sm">auto_stories</span>
+                Fitur Baru
+            </div>
+            <h3 class="text-slate-900 dark:text-white text-xl font-bold mb-1">Belajar & Latihan SKD</h3>
+            <p class="text-sm text-slate-500 dark:text-slate-400">Pelajari materi TWK, TIU, TKP dan kerjakan latihan soal per sub-topik untuk mempersiapkan ujian.</p>
+        </div>
+        <a href="{{ route('peserta.learn.index') }}" class="bg-primary hover:bg-primary/90 text-white font-semibold py-3 px-6 rounded-xl flex items-center gap-2 shadow-lg shadow-primary/20 transition-all shrink-0">
+            <span class="material-symbols-outlined">menu_book</span>
+            Mulai Belajar
+        </a>
+    </div>
+</div>
+
 <!-- Recent Activity and Learning Progress -->
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
     <!-- Activity Feed -->
@@ -124,35 +145,32 @@
     <div class="flex flex-col gap-6">
         <h3 class="text-xl font-bold text-slate-900 dark:text-white">Progres Belajar</h3>
         <div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+            @php
+                $colors = [
+                    'blue' => 'bg-blue-500 text-blue-600',
+                    'purple' => 'bg-purple-500 text-purple-600',
+                    'emerald' => 'bg-emerald-500 text-emerald-600',
+                ];
+            @endphp
+            @foreach($learningProgress as $lp)
+            @php
+                $colorClasses = $colors[$lp->color] ?? 'bg-blue-500 text-blue-600';
+                $bgClass = explode(' ', $colorClasses)[0];
+                $textClass = explode(' ', $colorClasses)[1];
+            @endphp
             <div class="mb-6">
                 <div class="flex justify-between text-sm mb-2">
-                    <span class="font-bold text-slate-700 dark:text-slate-300">TWK (Wawasan Kebangsaan)</span>
-                    <span class="font-black text-primary">{{ $twkPercent }}%</span>
+                    <span class="font-bold text-slate-700 dark:text-slate-300">{{ $lp->name }}</span>
+                    <span class="font-black {{ $textClass }}">{{ $lp->progress }}%</span>
                 </div>
                 <div class="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2">
-                    <div class="bg-primary h-2 rounded-full" style="width: {{ $twkPercent }}%"></div>
+                    <div class="{{ $bgClass }} h-2 rounded-full" style="width: {{ $lp->progress }}%"></div>
                 </div>
             </div>
-            <div class="mb-6">
-                <div class="flex justify-between text-sm mb-2">
-                    <span class="font-bold text-slate-700 dark:text-slate-300">TIU (Intelegensia Umum)</span>
-                    <span class="font-black text-primary">{{ $tiuPercent }}%</span>
-                </div>
-                <div class="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2">
-                    <div class="bg-primary h-2 rounded-full" style="width: {{ $tiuPercent }}%"></div>
-                </div>
-            </div>
-            <div class="mb-2">
-                <div class="flex justify-between text-sm mb-2">
-                    <span class="font-bold text-slate-700 dark:text-slate-300">TKP (Karakteristik Pribadi)</span>
-                    <span class="font-black text-primary">{{ $tkpPercent }}%</span>
-                </div>
-                <div class="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2">
-                    <div class="bg-primary h-2 rounded-full" style="width: {{ $tkpPercent }}%"></div>
-                </div>
-            </div>
-            <a href="{{ route('peserta.skd.index') }}" class="block w-full mt-6 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 py-3 rounded-xl font-bold hover:opacity-90 transition-opacity text-center">
-                Mulai Simulasi
+            @endforeach
+
+            <a href="{{ route('peserta.learn.index') }}" class="block w-full mt-6 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 py-3 rounded-xl font-bold hover:opacity-90 transition-opacity text-center">
+                Lanjutkan Belajar
             </a>
         </div>
 

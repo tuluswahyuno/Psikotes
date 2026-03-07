@@ -55,4 +55,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(Result::class);
     }
+
+    public function materialProgress(): HasMany
+    {
+        return $this->hasMany(UserMaterialProgress::class);
+    }
+
+    public function practiceAttempts(): HasMany
+    {
+        return $this->hasMany(PracticeAttempt::class);
+    }
 }

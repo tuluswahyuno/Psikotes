@@ -12,6 +12,8 @@ use App\Http\Controllers\Peserta\DashboardController as PesertaDashboardControll
 use App\Http\Controllers\Peserta\TestSessionController;
 use App\Http\Controllers\Peserta\ResultController as PesertaResultController;
 use App\Http\Controllers\Peserta\SkdController;
+use App\Http\Controllers\Peserta\LearningController;
+use App\Http\Controllers\Peserta\PracticeController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -69,6 +71,17 @@ Route::middleware(['auth', 'role:peserta'])->prefix('peserta')->name('peserta.')
     Route::get('/skd-results/{skdResult}', [SkdController::class, 'resultShow'])->name('skd.results.show');
     Route::get('/skd-results/{skdResult}/review', [SkdController::class, 'review'])->name('skd.results.review');
     Route::get('/skd-leaderboard', [SkdController::class, 'leaderboard'])->name('skd.leaderboard');
+
+    // Learning Routes
+    Route::get('/learn', [LearningController::class, 'index'])->name('learn.index');
+    Route::get('/learn/{section:slug}', [LearningController::class, 'section'])->name('learn.section');
+    Route::get('/learn/{section:slug}/{subTopic:slug}', [LearningController::class, 'material'])->name('learn.material');
+    Route::post('/learn/complete-material', [LearningController::class, 'completeMaterial'])->name('learn.complete');
+
+    // Practice Routes
+    Route::post('/practice/submit', [PracticeController::class, 'submit'])->name('practice.submit');
+    Route::get('/practice/result/{attempt}', [PracticeController::class, 'result'])->name('practice.result');
+    Route::get('/practice/{section:slug}/{subTopic:slug}', [PracticeController::class, 'start'])->name('practice.start');
 });
 
 // Profile Routes

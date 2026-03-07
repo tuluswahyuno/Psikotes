@@ -34,21 +34,40 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
-        // Best scores for progress bars
-        $bestTwk = SkdResult::where('user_id', $user->id)->max('twk_score') ?? 0;
-        $bestTiu = SkdResult::where('user_id', $user->id)->max('tiu_score') ?? 0;
-        $bestTkp = SkdResult::where('user_id', $user->id)->max('tkp_score') ?? 0;
-
-        // Progress percentages (TWK max 150, TIU max 175, TKP max 225)
-        $twkPercent = $bestTwk > 0 ? min(100, round($bestTwk / 150 * 100)) : 0;
-        $tiuPercent = $bestTiu > 0 ? min(100, round($bestTiu / 175 * 100)) : 0;
-        $tkpPercent = $bestTkp > 0 ? min(100, round($bestTkp / 225 * 100)) : 0;
+        // Learning Progress from Belajar SKD
+        $learningSections = \App\Models\Section::with('subTopics.materials')->get();
+        $learningProgress = [];
+        
+        foreach ($learningSections as $section) {
+            $totalMaterials = 0;
+            $completedMaterials = 0;
+            
+            foreach ($section->subTopics as $subTopic) {
+                $materialCount = $subTopic->materials->count();
+                $totalMaterials += $materialCount;
+                
+                if ($materialCount > 0) {
+                    $completedMaterials += \App\Models\UserMaterialProgress::where('user_id', $user->id)
+                        ->whereIn('material_id', $subTopic->materials->pluck('id'))
+                        ->whereNotNull('completed_at')
+                        ->count();
+                }
+            }
+            
+            $progress = $totalMaterials > 0 ? round(($completedMaterials / $totalMaterials) * 100) : 0;
+            
+            $learningProgress[] = (object) [
+                'name' => $section->name,
+                'slug' => $section->slug,
+                'color' => $section->color ?? 'blue',
+                'progress' => $progress,
+            ];
+        }
 
         return view('peserta.dashboard', compact(
             'assignments', 'completedCount', 'pendingCount',
             'skdCompletedCount', 'latestSkdResults',
-            'bestTwk', 'bestTiu', 'bestTkp',
-            'twkPercent', 'tiuPercent', 'tkpPercent'
+            'learningProgress'
         ));
     }
 }
